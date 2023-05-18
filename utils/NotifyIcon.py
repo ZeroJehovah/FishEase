@@ -2,7 +2,7 @@ from threading import Thread
 from pystray import Menu, MenuItem, Icon
 from PIL import Image
 
-from utils.Timer import Timer
+from utils.Timer import stop
 from utils.FormUtils import FormUtils
 from utils.ConfigUtils import ConfigUtils, save_form_configs
 
@@ -70,7 +70,7 @@ def about():  # “关于”的点击事件
 
 
 def exit_app():  # “退出”的点击事件
-    Timer.stop()
+    stop()
     NotifyInco.icon.stop()
 
 
