@@ -1,5 +1,6 @@
-import configparser
-import os
+from configparser import ConfigParser
+from os import path, mkdir
+
 from vo.RECT import RECT
 from vo.FormInfo import FormInfo
 
@@ -23,42 +24,42 @@ class ConfigUtils:
     global_form_small_rect: RECT = None
     global_form_volume: int = 0
 
-    @staticmethod
-    def init_global_form_infos():
-        config = read_config(APP_CONFIG_FILE)
-        for section in config.sections():
-            if not get_config(config, section, APP_CONFIG_TITLE):
-                continue
-            form_info = FormInfo(section, get_config(config, section, APP_CONFIG_TITLE), get_config(config, section, APP_CONFIG_CLASSNAME), get_config(config, section, APP_CONFIG_SMALL_CLIENT_WIDTH))
-            ConfigUtils.global_form_infos.append(form_info)
 
-    @staticmethod
-    def read_form_configs():
-        config = read_config(FORM_CONFIG_FILE)
-        ConfigUtils.global_form_small_rect = RECT(get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_LEFT), get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_TOP), get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_RIGHT), get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_BOTTOM))
-        ConfigUtils.global_form_volume = get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_VOLUME)
-        ConfigUtils.global_form_volume = int(ConfigUtils.global_form_volume) if ConfigUtils.global_form_volume else 0
+def init_app_configs():
+    config = read_config(APP_CONFIG_FILE)
+    for section in config.sections():
+        if not get_config(config, section, APP_CONFIG_TITLE):
+            continue
+        form_info = FormInfo(section, get_config(config, section, APP_CONFIG_TITLE), get_config(config, section, APP_CONFIG_CLASSNAME), get_config(config, section, APP_CONFIG_SMALL_CLIENT_WIDTH))
+        ConfigUtils.global_form_infos.append(form_info)
 
-    @staticmethod
-    def save_form_configs():
-        config = configparser.ConfigParser()
-        config[ConfigUtils.global_running_form_name] = {
-            FORM_CONFIG_LEFT: str(ConfigUtils.global_form_small_rect.left),
-            FORM_CONFIG_TOP: str(ConfigUtils.global_form_small_rect.top),
-            FORM_CONFIG_RIGHT: str(ConfigUtils.global_form_small_rect.right),
-            FORM_CONFIG_BOTTOM: str(ConfigUtils.global_form_small_rect.bottom),
-            FORM_CONFIG_VOLUME: str(ConfigUtils.global_form_volume)
-        }
-        with open(FORM_CONFIG_FILE, 'w', encoding=CONFIG_FILE_CHARSET) as config_file:
-            config.write(config_file)
+
+def read_form_configs():
+    config = read_config(FORM_CONFIG_FILE)
+    ConfigUtils.global_form_small_rect = RECT(get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_LEFT), get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_TOP), get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_RIGHT), get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_BOTTOM))
+    ConfigUtils.global_form_volume = get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_VOLUME)
+    ConfigUtils.global_form_volume = int(ConfigUtils.global_form_volume) if ConfigUtils.global_form_volume else 0
+
+
+def save_form_configs():
+    config = ConfigParser()
+    config[ConfigUtils.global_running_form_name] = {
+        FORM_CONFIG_LEFT: str(ConfigUtils.global_form_small_rect.left),
+        FORM_CONFIG_TOP: str(ConfigUtils.global_form_small_rect.top),
+        FORM_CONFIG_RIGHT: str(ConfigUtils.global_form_small_rect.right),
+        FORM_CONFIG_BOTTOM: str(ConfigUtils.global_form_small_rect.bottom),
+        FORM_CONFIG_VOLUME: str(ConfigUtils.global_form_volume)
+    }
+    with open(CONFIG_DIR + "/" + FORM_CONFIG_FILE, 'w', encoding=CONFIG_FILE_CHARSET) as config_file:
+        config.write(config_file)
 
 
 def read_config(file_name: str):
-    config = configparser.ConfigParser()
-    if not os.path.exists(CONFIG_DIR):
-        os.mkdir(CONFIG_DIR)
+    config = ConfigParser()
+    if not path.exists(CONFIG_DIR):
+        mkdir(CONFIG_DIR)
     file_name = CONFIG_DIR + "/" + file_name
-    if os.path.exists(file_name):  # 配置文件存在，读取配置
+    if path.exists(file_name):  # 配置文件存在，读取配置
         print(f"read config from {file_name}")
         with open(file_name, 'r', encoding=CONFIG_FILE_CHARSET) as config_file:
             config.read_file(config_file)
@@ -78,7 +79,7 @@ def read_config(file_name: str):
     return config
 
 
-def get_config(config: configparser, section: str, option: str):
+def get_config(config, section: str, option: str):
     if config.has_section(section) and config.has_option(section, option):
         return config.get(section, option)
     return None

@@ -1,4 +1,6 @@
 /.idea/
 /build/
 /dist/
-form.ini
+*.ini
+setup.py
+.lock
