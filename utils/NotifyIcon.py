@@ -17,14 +17,14 @@ class NotifyInco:
     icon: Icon = None
     has_running_form: bool = False
     form_title: str = DEFAULT_TITLE
-    enable_change_size: bool = True
+    enable_change_rect: bool = True
 
 
 def init_notify_icon():  # 初始化通知栏图标
     menu_list = Menu(
         MenuItem(lambda item: NotifyInco.form_title, None, enabled=False),
         Menu.SEPARATOR,
-        MenuItem('调节尺寸', change_size, enabled=lambda item: NotifyInco.has_running_form and NotifyInco.enable_change_size, checked=lambda item: NotifyInco.has_running_form and FormUtils.global_is_change_rect and NotifyInco.enable_change_size),
+        MenuItem('调节尺寸', change_size, enabled=lambda item: NotifyInco.has_running_form and NotifyInco.enable_change_rect, checked=lambda item: NotifyInco.has_running_form and FormUtils.global_is_change_rect and NotifyInco.enable_change_rect),
         MenuItem("调节音量", Menu(
             MenuItem('0(静音)', lambda item: change_volume(0), checked=lambda item: ConfigUtils.global_form_volume == 0),
             MenuItem('10%', lambda item: change_volume(10), checked=lambda item: ConfigUtils.global_form_volume == 10),
@@ -48,10 +48,10 @@ def init_notify_icon():  # 初始化通知栏图标
     Thread(target=NotifyInco.icon.run, daemon=True).start()
 
 
-def set_nofify_icon(has_running_form: bool, form_title: str = None, enable_change_size: bool = True):  # 设置通知栏内部分显示，可显示监测窗口的标题
+def set_nofify_icon(has_running_form: bool, form_title: str = None, enable_change_rect: bool = True):  # 设置通知栏内部分显示，可显示监测窗口的标题
     NotifyInco.has_running_form = has_running_form
     NotifyInco.form_title = form_title if form_title else DEFAULT_TITLE
-    NotifyInco.enable_change_size = enable_change_size
+    NotifyInco.enable_change_rect = enable_change_rect
     NotifyInco.icon.update_menu()
 
 

@@ -48,8 +48,7 @@ def change_to_original():  # 将目标窗口调整为原尺寸
         return
     if GetWindowPlacement(FormUtils.global_running_form)[1] == win32con.SW_SHOWMINIMIZED:
         ShowWindow(FormUtils.global_running_form, win32con.SW_RESTORE)
-    current_client_rect = get_client_rect(FormUtils.global_running_form)
-    if current_client_rect.width() > FormUtils.global_running_form_info.small_client_width:  # 当前已经处于原尺寸，无需执行
+    if is_original():  # 当前已经处于原尺寸，无需执行
         return
     update_small_rect()
     if FormUtils.global_last_focus == FormUtils.global_running_form:
@@ -64,12 +63,11 @@ def change_to_small():  # 将目标窗口缩小并置顶
     change_audio_to_small()
     if not FormUtils.global_running_form or not IsWindow(FormUtils.global_running_form):  # 如果窗口不存在，则不执行
         return
-    if not FormUtils.global_running_form_info.small_client_width or not FormUtils.global_is_change_rect:
+    if not FormUtils.global_running_form_info.enable_change_rect() or not FormUtils.global_is_change_rect:
         return
     if GetWindowPlacement(FormUtils.global_running_form)[1] == win32con.SW_SHOWMINIMIZED:
         return
-    current_client_rect = get_client_rect(FormUtils.global_running_form)
-    if current_client_rect.width() == FormUtils.global_running_form_info.small_client_width:  # 当前已经处于缩小尺寸，无需执行
+    if not is_original():  # 当前已经处于缩小尺寸，无需执行
         return
     update_original_rect()
     SetWindowPos(FormUtils.global_running_form, win32con.HWND_TOPMOST, ConfigUtils.global_form_small_rect.left, ConfigUtils.global_form_small_rect.top, ConfigUtils.global_form_small_rect.width(), ConfigUtils.global_form_small_rect.height(), win32con.SWP_NOACTIVATE)
@@ -121,34 +119,33 @@ def find_new_form_and_init():  # 寻找待监测的窗口，找到后执行初�
             if max_width_form:
                 form_classname = GetClassName(max_width_form)
                 print(f"found {len(find_forms)} forms named {form_info.title}, the largest form is {max_width_form}: {form_info.title}(classname={form_classname})")
+                form_info.classname = form_classname
                 return check_running_form(max_width_form, form_info)
     return False
 
 
 def check_running_form(running_form: int, running_form_info: FormInfo):  # 检查找到的窗口是否符合要求，如果是，则初始化各项参数
-    running_form_client_rect = get_client_rect(running_form)
-    # print(f"get form {running_form}'s client RECT: {dumps(running_form_client_rect.__dict__)}")
-    if running_form_client_rect.width() <= running_form_info.small_client_width:
-        # print(f"form {running_form}'s client width({running_form_client_rect.width()}) is to small, maybe catch a wrong target")
+    if not is_original(running_form, running_form_info.small_client_width):
         return False
-    print(f"catch form {running_form} success")
+    print(f"catch form {running_form} success: {running_form_info.title}(classname={running_form_info.classname})")
     FormUtils.is_find_info_print = False
     FormUtils.global_running_form = running_form
     FormUtils.global_running_form_info = running_form_info
     init_running_audio_session(running_form)
     set_notify_icon()
-    init_form_configs(running_form_client_rect)
+    init_form_configs()
     return True
 
 
-def init_form_configs(original_client_rect: RECT):  # 初始化窗口各项参数
-    if not FormUtils.global_running_form_info.small_client_width:  # 如果未配置small_client_width，则禁用调整大小的功能
+def init_form_configs():  # 初始化窗口各项参数
+    if not FormUtils.global_running_form_info.enable_change_rect():  # 如果未配置small_client_width，则禁用调整大小的功能
         return
     FormUtils.original_rect = get_window_rect(FormUtils.global_running_form)
     print(f"init target form's original RECT: {dumps(FormUtils.original_rect.__dict__)}")
     ConfigUtils.global_running_form_name = FormUtils.global_running_form_info.name
     read_form_configs()
     if ConfigUtils.global_form_small_rect.width() <= 0 or ConfigUtils.global_form_small_rect.height() <= 0:
+        original_client_rect = get_client_rect(FormUtils.global_running_form)
         small_client_width = FormUtils.global_running_form_info.small_client_width
         small_client_height = int(small_client_width * original_client_rect.height() / original_client_rect.width())
         small_width = small_client_width + FormUtils.original_rect.width() - original_client_rect.width()
@@ -174,7 +171,7 @@ def find_forms_by_title(title: str):  # 通过标题查找所有符合的窗口
 
 def set_notify_icon():  # 设置通知栏图标
     from utils.NotifyIcon import set_nofify_icon
-    set_nofify_icon(True, FormUtils.global_running_form_info.title, FormUtils.global_running_form_info.small_client_width > 0)
+    set_nofify_icon(True, FormUtils.global_running_form_info.title, FormUtils.global_running_form_info.enable_change_rect())
 
 
 def reset_notify_icon():  # 将通知栏图标初始化为未监测状态
@@ -195,3 +192,10 @@ def update_original_rect():  # 更新原尺寸窗口的位置信息
     if FormUtils.original_rect != current_rect:  # 读取新的缩小尺寸并保存
         FormUtils.original_rect = current_rect
         print("update original RECT:", dumps(FormUtils.original_rect.__dict__))
+
+
+def is_original(form: int = 0, small_client_width: int = 0):
+    form = form if form else FormUtils.global_running_form
+    small_client_width = small_client_width if small_client_width else FormUtils.global_running_form_info.small_client_width
+    current_client_rect = get_client_rect(form)
+    return current_client_rect.width() > small_client_width

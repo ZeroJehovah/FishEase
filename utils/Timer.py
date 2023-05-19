@@ -33,7 +33,7 @@ def main_loop_action():  # 程序主要逻辑，循环监测目标窗口是否�
     # print("current focus title:", current_focus_title)
     if not current_focus_title or current_focus_title in SYS_FORM_TITLE:  # 当前焦点是系统组件，则视为未改变焦点状态
         current_focus = FormUtils.global_last_focus
-    elif FormUtils.global_running_form_info.small_client_width and FormUtils.global_is_change_rect:
+    elif FormUtils.global_running_form_info.enable_change_rect() and FormUtils.global_is_change_rect:
         is_alt_pressed = is_pressed('alt')
         if current_focus == FormUtils.global_running_form and is_alt_pressed:
             Timer.alt_moving = True

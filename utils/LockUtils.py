@@ -36,7 +36,6 @@ def write_lock_file():
 def check_pid_exists(pid: int):
     if pid <= 0:
         return False
-    print("get last pid:", pid)
     try:
         process = Process(pid)
         process_name = process.name()
