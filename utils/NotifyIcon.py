@@ -8,9 +8,9 @@ from utils.ConfigUtils import ConfigUtils, save_form_configs
 
 ICON_TITLE = "摸鱼小助手"
 ICON_IMAGE = Image.open("resources/icon.ico")
-DEFAULT_TITLE = "未运行"
+DEFAULT_TITLE = "未发现目标窗口"
 REPO_URL = "https://github.com/ZeroJehovah/FishEase"
-VERSION = "1.0.1.0"
+VERSION = "1.0.2.0"
 
 
 class NotifyInco:
