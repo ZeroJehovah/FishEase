@@ -10,7 +10,7 @@ ICON_TITLE = "摸鱼小助手"
 ICON_IMAGE = Image.open("resources/icon.ico")
 DEFAULT_TITLE = "未运行"
 REPO_URL = "https://github.com/ZeroJehovah/FishEase"
-VERSION = "1.0.0.0"
+VERSION = "1.0.1.0"
 
 
 class NotifyInco:
