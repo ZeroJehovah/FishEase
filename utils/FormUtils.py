@@ -125,7 +125,7 @@ def find_new_form_and_init():  # 寻找待监测的窗口，找到后执行初�
 
 
 def check_running_form(running_form: int, running_form_info: FormInfo):  # 检查找到的窗口是否符合要求，如果是，则初始化各项参数
-    if not is_original(running_form, running_form_info.small_client_width):
+    if not is_original(running_form, running_form_info.small_client_width if running_form_info.enable_change_rect() else 1):
         return False
     print(f"catch form {running_form} success: {running_form_info.title}(classname={running_form_info.classname})")
     FormUtils.is_find_info_print = False
