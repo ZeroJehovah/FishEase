@@ -1,3 +1,4 @@
+import traceback
 from json import dumps
 import win32con
 from win32gui import *
@@ -46,17 +47,20 @@ def change_to_original(volume: int = 0):  # 将目标窗口调整为原尺寸
         return
     if not FormUtils.global_is_change_rect:
         return
-    if GetWindowPlacement(FormUtils.global_running_form)[1] == win32con.SW_SHOWMINIMIZED:
-        ShowWindow(FormUtils.global_running_form, win32con.SW_RESTORE)
-    if is_original():  # 当前已经处于原尺寸，无需执行
-        return
-    update_small_rect()
-    if FormUtils.global_last_focus == FormUtils.global_running_form:
-        SetWindowPos(FormUtils.global_running_form, win32con.HWND_NOTOPMOST, FormUtils.original_rect.left, FormUtils.original_rect.top, FormUtils.original_rect.width(), FormUtils.original_rect.height(), 0)
-    else:
-        SetWindowPos(FormUtils.global_running_form, FormUtils.global_last_focus, FormUtils.original_rect.left, FormUtils.original_rect.top, FormUtils.original_rect.width(), FormUtils.original_rect.height(), win32con.SWP_NOACTIVATE)
-        change_focus_to_last_focus()
-    print(f"change form {FormUtils.global_running_form} to original RECT")
+    try:
+        if GetWindowPlacement(FormUtils.global_running_form)[1] == win32con.SW_SHOWMINIMIZED:
+            ShowWindow(FormUtils.global_running_form, win32con.SW_RESTORE)
+        if is_original():  # 当前已经处于原尺寸，无需执行
+            return
+        update_small_rect()
+        if FormUtils.global_last_focus == FormUtils.global_running_form:
+            SetWindowPos(FormUtils.global_running_form, win32con.HWND_NOTOPMOST, FormUtils.original_rect.left, FormUtils.original_rect.top, FormUtils.original_rect.width(), FormUtils.original_rect.height(), 0)
+        else:
+            SetWindowPos(FormUtils.global_running_form, FormUtils.global_last_focus, FormUtils.original_rect.left, FormUtils.original_rect.top, FormUtils.original_rect.width(), FormUtils.original_rect.height(), win32con.SWP_NOACTIVATE)
+            change_focus_to_last_focus()
+        print(f"change form {FormUtils.global_running_form} to original RECT")
+    except:
+        traceback.print_exc()
 
 
 def change_to_small():  # 将目标窗口缩小并置顶
@@ -65,33 +69,47 @@ def change_to_small():  # 将目标窗口缩小并置顶
         return
     if not FormUtils.global_running_form_info.enable_change_rect() or not FormUtils.global_is_change_rect:
         return
-    if GetWindowPlacement(FormUtils.global_running_form)[1] == win32con.SW_SHOWMINIMIZED:
-        return
-    if not is_original():  # 当前已经处于缩小尺寸，无需执行
-        return
-    update_original_rect()
-    SetWindowPos(FormUtils.global_running_form, win32con.HWND_TOPMOST, ConfigUtils.global_form_small_rect.left, ConfigUtils.global_form_small_rect.top, ConfigUtils.global_form_small_rect.width(), ConfigUtils.global_form_small_rect.height(), win32con.SWP_NOACTIVATE)
-    print(f"change form {FormUtils.global_running_form} to small RECT")
+    try:
+        if GetWindowPlacement(FormUtils.global_running_form)[1] == win32con.SW_SHOWMINIMIZED:
+            return
+        if not is_original():  # 当前已经处于缩小尺寸，无需执行
+            return
+        update_original_rect()
+        SetWindowPos(FormUtils.global_running_form, win32con.HWND_TOPMOST, ConfigUtils.global_form_small_rect.left, ConfigUtils.global_form_small_rect.top, ConfigUtils.global_form_small_rect.width(), ConfigUtils.global_form_small_rect.height(), win32con.SWP_NOACTIVATE)
+        print(f"change form {FormUtils.global_running_form} to small RECT")
+    except:
+        traceback.print_exc()
 
 
 def change_focus_to_last_focus():  # 将上一个焦点窗口重新设置为焦点
     if not FormUtils.global_last_focus or not IsWindow(FormUtils.global_last_focus):  # 如果窗口不存在，则不执行
         return
-    last_focus_title = GetWindowText(FormUtils.global_last_focus)
-    print("change focus to", last_focus_title)
-    shell = client.Dispatch("WScript.Shell")
-    shell.SendKeys('%')
-    SetForegroundWindow(FormUtils.global_last_focus)
+    try:
+        last_focus_title = GetWindowText(FormUtils.global_last_focus)
+        print("change focus to", last_focus_title)
+        shell = client.Dispatch("WScript.Shell")
+        shell.SendKeys('%')
+        SetForegroundWindow(FormUtils.global_last_focus)
+    except:
+        traceback.print_exc()
 
 
 def get_window_rect(form: int):  # 对win32gui.GetWindowRect的简单封装
-    left, top, right, bottom = GetWindowRect(form)
-    return RECT(left, top, right, bottom)
+    try:
+        left, top, right, bottom = GetWindowRect(form)
+        return RECT(left, top, right, bottom)
+    except:
+        traceback.print_exc()
+        return RECT(0, 0, 0, 0)
 
 
 def get_client_rect(form: int):  # 对win32gui.GetClientRect的简单封装
-    left, top, right, bottom = GetClientRect(form)
-    return RECT(left, top, right, bottom)
+    try:
+        left, top, right, bottom = GetClientRect(form)
+        return RECT(left, top, right, bottom)
+    except:
+        traceback.print_exc()
+        return RECT(0, 0, 0, 0)
 
 
 def find_new_form_and_init():  # 寻找待监测的窗口，找到后执行初始化
@@ -117,10 +135,14 @@ def find_new_form_and_init():  # 寻找待监测的窗口，找到后执行初�
                 form_rect = get_window_rect(find_form)
                 max_width, max_width_form = (form_rect.width(), find_form) if form_rect.width() > max_width else (max_width, max_width_form)
             if max_width_form:
-                form_classname = GetClassName(max_width_form)
-                print(f"found {len(find_forms)} forms named {form_info.title}, the largest form is {max_width_form}: {form_info.title}(classname={form_classname})")
-                form_info.classname = form_classname
-                return check_running_form(max_width_form, form_info)
+                try:
+                    form_classname = GetClassName(max_width_form)
+                    print(f"found {len(find_forms)} forms named {form_info.title}, the largest form is {max_width_form}: {form_info.title}(classname={form_classname})")
+                    form_info.classname = form_classname
+                    return check_running_form(max_width_form, form_info)
+                except:
+                    traceback.print_exc()
+                    return False
     return False
 
 
