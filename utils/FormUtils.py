@@ -40,8 +40,8 @@ def init_target_form():  # 检测当前是否有监测的窗口
     return False
 
 
-def change_to_original():  # 将目标窗口调整为原尺寸
-    change_audio_to_original()
+def change_to_original(volume: int = 0):  # 将目标窗口调整为原尺寸
+    change_audio_to_original(volume)
     if not FormUtils.global_running_form or not IsWindow(FormUtils.global_running_form):  # 如果窗口不存在，则不执行
         return
     if not FormUtils.global_is_change_rect:

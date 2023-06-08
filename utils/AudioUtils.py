@@ -36,12 +36,13 @@ def init_running_audio_session(running_form: int = None):  # 初始化监测窗�
         reset_audio_session()
 
 
-def change_to_original():  # 把音量调整到100
-    set_volume(100)
+def change_to_original(volume: int):  # 把音量调整到设置的前台音量
+    volume = volume if volume else ConfigUtils.global_form_volume_fore
+    set_volume(volume)
 
 
 def change_to_small():  # 把音量调整小，具体值在右键菜单里设置
-    set_volume(ConfigUtils.global_form_volume)
+    set_volume(ConfigUtils.global_form_volume_back)
 
 
 def reset_audio_session():

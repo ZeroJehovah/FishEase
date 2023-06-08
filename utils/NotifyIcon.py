@@ -25,18 +25,31 @@ def init_notify_icon():  # 初始化通知栏图标
         MenuItem(lambda item: NotifyInco.form_title, None, enabled=False),
         Menu.SEPARATOR,
         MenuItem('调节尺寸', change_size, enabled=lambda item: NotifyInco.has_running_form and NotifyInco.enable_change_rect, checked=lambda item: NotifyInco.has_running_form and FormUtils.global_is_change_rect and NotifyInco.enable_change_rect),
-        MenuItem("调节音量", Menu(
-            MenuItem('0(静音)', lambda item: change_volume(0), checked=lambda item: ConfigUtils.global_form_volume == 0),
-            MenuItem('10%', lambda item: change_volume(10), checked=lambda item: ConfigUtils.global_form_volume == 10),
-            MenuItem('20%', lambda item: change_volume(20), checked=lambda item: ConfigUtils.global_form_volume == 20),
-            MenuItem('30%', lambda item: change_volume(30), checked=lambda item: ConfigUtils.global_form_volume == 30),
-            MenuItem('40%', lambda item: change_volume(40), checked=lambda item: ConfigUtils.global_form_volume == 40),
-            MenuItem('50%', lambda item: change_volume(50), checked=lambda item: ConfigUtils.global_form_volume == 50),
-            MenuItem('60%', lambda item: change_volume(60), checked=lambda item: ConfigUtils.global_form_volume == 60),
-            MenuItem('70%', lambda item: change_volume(70), checked=lambda item: ConfigUtils.global_form_volume == 70),
-            MenuItem('80%', lambda item: change_volume(80), checked=lambda item: ConfigUtils.global_form_volume == 80),
-            MenuItem('90%', lambda item: change_volume(80), checked=lambda item: ConfigUtils.global_form_volume == 90),
-            MenuItem('100%(不调整)', lambda item: change_volume(100), checked=lambda item: ConfigUtils.global_form_volume == 100),
+        MenuItem("前台音量", Menu(
+            MenuItem('  0%', lambda item: change_volume_fore(0), checked=lambda item: ConfigUtils.global_form_volume_fore == 0),
+            MenuItem(' 10%', lambda item: change_volume_fore(10), checked=lambda item: ConfigUtils.global_form_volume_fore == 10),
+            MenuItem(' 20%', lambda item: change_volume_fore(20), checked=lambda item: ConfigUtils.global_form_volume_fore == 20),
+            MenuItem(' 30%', lambda item: change_volume_fore(30), checked=lambda item: ConfigUtils.global_form_volume_fore == 30),
+            MenuItem(' 40%', lambda item: change_volume_fore(40), checked=lambda item: ConfigUtils.global_form_volume_fore == 40),
+            MenuItem(' 50%', lambda item: change_volume_fore(50), checked=lambda item: ConfigUtils.global_form_volume_fore == 50),
+            MenuItem(' 60%', lambda item: change_volume_fore(60), checked=lambda item: ConfigUtils.global_form_volume_fore == 60),
+            MenuItem(' 70%', lambda item: change_volume_fore(70), checked=lambda item: ConfigUtils.global_form_volume_fore == 70),
+            MenuItem(' 80%', lambda item: change_volume_fore(80), checked=lambda item: ConfigUtils.global_form_volume_fore == 80),
+            MenuItem(' 90%', lambda item: change_volume_fore(80), checked=lambda item: ConfigUtils.global_form_volume_fore == 90),
+            MenuItem('100%', lambda item: change_volume_fore(100), checked=lambda item: ConfigUtils.global_form_volume_fore == 100),
+        ), enabled=lambda item: NotifyInco.has_running_form),
+        MenuItem("后台音量", Menu(
+            MenuItem('  0%', lambda item: change_volume_back(0), checked=lambda item: ConfigUtils.global_form_volume_back == 0),
+            MenuItem(' 10%', lambda item: change_volume_back(10), checked=lambda item: ConfigUtils.global_form_volume_back == 10),
+            MenuItem(' 20%', lambda item: change_volume_back(20), checked=lambda item: ConfigUtils.global_form_volume_back == 20),
+            MenuItem(' 30%', lambda item: change_volume_back(30), checked=lambda item: ConfigUtils.global_form_volume_back == 30),
+            MenuItem(' 40%', lambda item: change_volume_back(40), checked=lambda item: ConfigUtils.global_form_volume_back == 40),
+            MenuItem(' 50%', lambda item: change_volume_back(50), checked=lambda item: ConfigUtils.global_form_volume_back == 50),
+            MenuItem(' 60%', lambda item: change_volume_back(60), checked=lambda item: ConfigUtils.global_form_volume_back == 60),
+            MenuItem(' 70%', lambda item: change_volume_back(70), checked=lambda item: ConfigUtils.global_form_volume_back == 70),
+            MenuItem(' 80%', lambda item: change_volume_back(80), checked=lambda item: ConfigUtils.global_form_volume_back == 80),
+            MenuItem(' 90%', lambda item: change_volume_back(80), checked=lambda item: ConfigUtils.global_form_volume_back == 90),
+            MenuItem('100%', lambda item: change_volume_back(100), checked=lambda item: ConfigUtils.global_form_volume_back == 100),
         ), enabled=lambda item: NotifyInco.has_running_form),
         Menu.SEPARATOR,
         # MenuItem('测试1', test),
@@ -59,8 +72,17 @@ def change_size():  # “调节尺寸”的点击事件
     FormUtils.global_is_change_rect = not FormUtils.global_is_change_rect
 
 
-def change_volume(volume: int):  # “调节音量”的点击事件
-    ConfigUtils.global_form_volume = volume
+def change_volume_fore(volume: int):  # “调节音量”的点击事件
+    ConfigUtils.global_form_volume_fore = volume
+    if ConfigUtils.global_form_volume_back > volume:
+        ConfigUtils.global_form_volume_back = volume
+    save_form_configs()
+
+
+def change_volume_back(volume: int):  # “调节音量”的点击事件
+    ConfigUtils.global_form_volume_back = volume
+    if ConfigUtils.global_form_volume_fore < volume:
+        ConfigUtils.global_form_volume_fore = volume
     save_form_configs()
 
 

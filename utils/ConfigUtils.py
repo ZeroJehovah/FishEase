@@ -15,14 +15,16 @@ FORM_CONFIG_LEFT = "left"
 FORM_CONFIG_TOP = "top"
 FORM_CONFIG_RIGHT = "right"
 FORM_CONFIG_BOTTOM = "bottom"
-FORM_CONFIG_VOLUME = "volume"
+FORM_CONFIG_VOLUME_FORE = "volume_fore"
+FORM_CONFIG_VOLUME_BACK = "volume_back"
 
 
 class ConfigUtils:
     global_form_infos: list = []
     global_running_form_name: str = None
     global_form_small_rect: RECT = None
-    global_form_volume: int = 0
+    global_form_volume_fore: int = 0
+    global_form_volume_back: int = 0
 
 
 def init_app_configs():
@@ -37,8 +39,10 @@ def init_app_configs():
 def read_form_configs():
     config = read_config(FORM_CONFIG_FILE)
     ConfigUtils.global_form_small_rect = RECT(get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_LEFT), get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_TOP), get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_RIGHT), get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_BOTTOM))
-    ConfigUtils.global_form_volume = get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_VOLUME)
-    ConfigUtils.global_form_volume = int(ConfigUtils.global_form_volume) if ConfigUtils.global_form_volume else 0
+    ConfigUtils.global_form_volume_fore = get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_VOLUME_FORE)
+    ConfigUtils.global_form_volume_fore = int(ConfigUtils.global_form_volume_fore) if ConfigUtils.global_form_volume_fore else 100
+    ConfigUtils.global_form_volume_back = get_config(config, ConfigUtils.global_running_form_name, FORM_CONFIG_VOLUME_BACK)
+    ConfigUtils.global_form_volume_back = int(ConfigUtils.global_form_volume_back) if ConfigUtils.global_form_volume_back else 0
 
 
 def save_form_configs():
@@ -48,7 +52,8 @@ def save_form_configs():
         FORM_CONFIG_TOP: str(ConfigUtils.global_form_small_rect.top),
         FORM_CONFIG_RIGHT: str(ConfigUtils.global_form_small_rect.right),
         FORM_CONFIG_BOTTOM: str(ConfigUtils.global_form_small_rect.bottom),
-        FORM_CONFIG_VOLUME: str(ConfigUtils.global_form_volume)
+        FORM_CONFIG_VOLUME_FORE: str(ConfigUtils.global_form_volume_fore),
+        FORM_CONFIG_VOLUME_BACK: str(ConfigUtils.global_form_volume_back)
     }
     with open(CONFIG_DIR + "/" + FORM_CONFIG_FILE, 'w', encoding=CONFIG_FILE_CHARSET) as config_file:
         config.write(config_file)

@@ -18,7 +18,7 @@ def main_loop():  # 程序主循环
         main_loop_action()
         sleep(MAIN_LOOP_DELAY)
     FormUtils.global_is_change_rect = True
-    change_to_original()
+    change_to_original(100)
 
 
 def stop():  # 退出主循环
