@@ -154,8 +154,8 @@ def check_running_form(running_form: int, running_form_info: FormInfo):  # æ£€æŸ
     FormUtils.global_running_form = running_form
     FormUtils.global_running_form_info = running_form_info
     init_running_audio_session(running_form)
-    set_notify_icon()
     init_form_configs()
+    set_notify_icon()
     return True
 
 
