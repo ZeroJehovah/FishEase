@@ -6,7 +6,7 @@ from pycaw.utils import AudioSession, AudioUtilities
 
 from utils.ConfigUtils import ConfigUtils
 
-EASING_TIME: float = 0.01
+EASING_TIME: float = 0.02
 EASING_STEPS: float = 2
 
 
