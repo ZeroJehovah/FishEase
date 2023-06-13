@@ -160,12 +160,12 @@ def check_running_form(running_form: int, running_form_info: FormInfo):  # 检�
 
 
 def init_form_configs():  # 初始化窗口各项参数
+    ConfigUtils.global_running_form_name = FormUtils.global_running_form_info.name
+    read_form_configs()
     if not FormUtils.global_running_form_info.enable_change_rect():  # 如果未配置small_client_width，则禁用调整大小的功能
         return
     FormUtils.original_rect = get_window_rect(FormUtils.global_running_form)
     print(f"init target form's original RECT: {dumps(FormUtils.original_rect.__dict__)}")
-    ConfigUtils.global_running_form_name = FormUtils.global_running_form_info.name
-    read_form_configs()
     if ConfigUtils.global_form_small_rect.width() <= 0 or ConfigUtils.global_form_small_rect.height() <= 0:
         original_client_rect = get_client_rect(FormUtils.global_running_form)
         small_client_width = FormUtils.global_running_form_info.small_client_width
