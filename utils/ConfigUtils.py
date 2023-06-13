@@ -46,15 +46,17 @@ def read_form_configs():
 
 
 def save_form_configs():
-    config = ConfigParser()
-    config[ConfigUtils.global_running_form_name] = {
-        FORM_CONFIG_LEFT: str(ConfigUtils.global_form_small_rect.left),
-        FORM_CONFIG_TOP: str(ConfigUtils.global_form_small_rect.top),
-        FORM_CONFIG_RIGHT: str(ConfigUtils.global_form_small_rect.right),
-        FORM_CONFIG_BOTTOM: str(ConfigUtils.global_form_small_rect.bottom),
-        FORM_CONFIG_VOLUME_FORE: str(ConfigUtils.global_form_volume_fore),
-        FORM_CONFIG_VOLUME_BACK: str(ConfigUtils.global_form_volume_back)
-    }
+    config = read_config(FORM_CONFIG_FILE)
+    if not config.has_section(ConfigUtils.global_running_form_name):
+        config[ConfigUtils.global_running_form_name] = {}
+    config[ConfigUtils.global_running_form_name][FORM_CONFIG_VOLUME_FORE] = str(ConfigUtils.global_form_volume_fore)
+    config[ConfigUtils.global_running_form_name][FORM_CONFIG_VOLUME_BACK] = str(ConfigUtils.global_form_volume_back)
+    from utils.FormUtils import FormUtils
+    if FormUtils.global_running_form_info.enable_change_rect():
+        config[ConfigUtils.global_running_form_name][FORM_CONFIG_LEFT] = str(ConfigUtils.global_form_small_rect.left)
+        config[ConfigUtils.global_running_form_name][FORM_CONFIG_TOP] = str(ConfigUtils.global_form_small_rect.top)
+        config[ConfigUtils.global_running_form_name][FORM_CONFIG_RIGHT] = str(ConfigUtils.global_form_small_rect.right)
+        config[ConfigUtils.global_running_form_name][FORM_CONFIG_BOTTOM] = str(ConfigUtils.global_form_small_rect.bottom)
     with open(CONFIG_DIR + "/" + FORM_CONFIG_FILE, 'w', encoding=CONFIG_FILE_CHARSET) as config_file:
         config.write(config_file)
 
